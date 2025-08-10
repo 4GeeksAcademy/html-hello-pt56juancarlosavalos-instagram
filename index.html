@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Instagram PT 56 Avalos</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        /* Estilos personalizados para la interfaz */
+        body {
+            background-color: #f5f5f5;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        /* Header de Instagram */
+        .instagram-header {
+            background-color: white;
+            border-bottom: 1px solid #dbdbdb;
+            padding: 8px 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .instagram-logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #262626;
+            text-decoration: none;
+        }
+
+        /* Botón Create new post */
+        .btn-create-post {
+            background-color: #0095f6;
+            border: none;
+            border-radius: 8px;
+            color: white;
+            padding: 8px 16px;
+            font-weight: 600;
+        }
+
+        .btn-create-post:hover {
+            background-color: #1877f2;
+            color: white;
+        }
+
+        /* Contenedor principal de imágenes */
+        .image-grid {
+            margin-top: 20px;
+            padding: 0 20px;
+        }
+
+        /* Vista de cuadrícula (3 columnas) */
+        .grid-view .image-item {
+            aspect-ratio: 1;
+            overflow: hidden;
+            margin-bottom: 3px;
+            position: relative;
+        }
+
+        .grid-view .image-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* Vista de feed (1 columna) */
+        .feed-view .post-item {
+            background: white;
+            border: 1px solid #dbdbdb;
+            border-radius: 8px;
+            margin-bottom: 24px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .feed-view .post-header {
+            padding: 16px;
+            border-bottom: 1px solid #efefef;
+        }
+
+        .feed-view .post-title {
+            font-weight: 600;
+            font-size: 16px;
+            margin: 0;
+        }
+
+        .feed-view .post-date {
+            color: #8e8e8e;
+            font-size: 12px;
+        }
+
+        .feed-view .post-image {
+            width: 100%;
+            display: block;
+        }
+
+        .feed-view .post-footer {
+            padding: 16px;
+        }
+
+        .feed-view .post-likes {
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .feed-view .post-description {
+            color: #262626;
+            font-size: 14px;
+        }
+
+        /* Controles de vista */
+        .view-controls {
+            display: flex;
+            justify-content: center;
+            margin: 20px 0;
+            gap: 10px;
+        }
+
+        .view-btn {
+            background: none;
+            border: none;
+            padding: 8px;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
+        .view-btn.active {
+            background-color: #0095f6;
+            color: white;
+        }
+
+        .view-btn i {
+            font-size: 18px;
+        }
+
+        /* Modal para crear nuevo post */
+        .modal-content {
+            border-radius: 12px;
+        }
+
+        .modal-header {
+            border-bottom: 1px solid #dbdbdb;
+        }
+
+        .modal-title {
+            font-weight: 600;
+        }
+
+        .caption-input {
+            border: 1px solid #dbdbdb;
+            border-radius: 6px;
+            padding: 12px;
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .modal-footer {
+            border-top: 1px solid #dbdbdb;
+        }
+
+        .btn-publish {
+            background-color: #0095f6;
+            border: none;
+            color: white;
+            padding: 8px 24px;
+            border-radius: 6px;
+            font-weight: 600;
+        }
+
+        .btn-close-modal {
+            background-color: #8e8e8e;
+            border: none;
+            color: white;
+            padding: 8px 24px;
+            border-radius: 6px;
+        }
+
+        /* Menu desplegable de configuración */
+        .settings-dropdown {
+            position: relative;
+        }
+
+        .dropdown-menu {
+            border: 1px solid #dbdbdb;
+            border-radius: 6px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .dropdown-item {
+            padding: 12px 16px;
+            font-size: 14px;
+        }
+
+        .dropdown-item:hover {
+            background-color: #f5f5f5;
+        }
+
+        /* Responsivo */
+        @media (max-width: 768px) {
+            .image-grid {
+                padding: 0 4px;
+            }
+            
+            .grid-view .image-item {
+                margin-bottom: 1px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header de Instagram -->
+    <header class="instagram-header">
+        <div class="container-fluid">
+            <div class="row align-items-center">
+                <div class="col-6">
+                    <a href="#" class="instagram-logo">
+                        <i class="fab fa-instagram me-2"></i>Instagram
+                    </a>
+                </div>
+                <div class="col-6 text-end">
+                    <button class="btn btn-create-post me-2" data-bs-toggle="modal" data-bs-target="#createPostModal">
+                        Create a new post
+                    </button>
+                    <div class="dropdown d-inline-block settings-dropdown">
+                        <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-cog"></i>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="#">Profile</a></li>
+                            <li><a class="dropdown-item" href="#">Accessibility</a></li>
+                            <li><a class="dropdown-item" href="#">Privacy and Data</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item text-danger" href="#">Log out</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Controles de vista -->
+    <div class="view-controls">
+        <button class="view-btn active" id="gridViewBtn" onclick="switchView('grid')">
+            <i class="fas fa-th"></i>
+        </button>
+        <button class="view-btn" id="feedViewBtn" onclick="switchView('feed')">
+            <i class="fas fa-square"></i>
+        </button>
+    </div>
+
+    <!-- Contenedor principal -->
+    <div class="container-fluid image-grid">
+        <!-- Vista de cuadrícula (3x3) -->
+        <div id="gridView" class="grid-view">
+            <div class="row">
+                <!-- Primera fila -->
+                <div class="col-4">
+                    <div class="image-item">
+                        <img src="https://images.unsplash.com/photo-1552053831-71594a27632d?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80" alt="Happy dog">
+                    </div>
+                </div>
+                <div class="col-4">
+                    <div class="image-item">
+                        <img src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80" alt="Group of friends">
+                    </div>
+                </div>
+                <div class="col-4">
+                    <div class="image-item">
+                        <img src="https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80" alt="Croatia coastline">
+                    </div>
+                </div>
+                <!-- Segunda fila -->
+                <div class="col-4">
+                    <div class="image-item">
+                        <img src="https://images.unsplash.com/photo-1494790108755-2616c3464d64?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80" alt="Smiling woman">
+                    </div>
+                </div>
+                <div class="col-4">
+                    <div class="image-item">
+                        <img src="https://images.unsplash.com/photo-1511739001486-6bfe10ce785f?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80" alt="Eiffel Tower">
+                    </div>
+                </div>
+                <div class="col-4">
+                    <div class="image-item">
+                        <img src="https://images.unsplash.com/photo-1574629810360-7efbbe195018?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80" alt="Soccer celebration">
+                    </div>
+                </div>
+                <!-- Tercera fila -->
+                <div class="col-4">
+                    <div class="image-item">
+                        <img src="https://images.unsplash.com/photo-1441986300917-64674bd600d8?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80" alt="Office work">
+                    </div>
+                </div>
+                <div class="col-4">
+                    <div class="image-item">
+                        <img src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80" alt="Mountain landscape">
+                    </div>
+                </div>
+                <div class="col-4">
+                    <div class="image-item">
+                        <img src="https://images.unsplash.com/photo-1517077304055-6e89abbf09b0?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80" alt="Food photography">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Vista de feed (posts individuales) -->
+        <div id="feedView" class="feed-view" style="display: none;">
+            <!-- Post 1 -->
+            <div class="post-item">
+                <div class="post-header">
+                    <h3 class="post-title">My Crazy dog Spark!</h3>
+                    <div class="post-date">04/26</div>
+                </div>
+                <img src="https://images.unsplash.com/photo-1552053831-71594a27632d?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="Happy dog" class="post-image">
+                <div class="post-footer">
+                    <div class="post-likes">204 Likes</div>
+                    <div class="post-description">This is an example of a very good photo that you can post on instagram</div>
+                </div>
+            </div>
+
+            <!-- Post 2 -->
+            <div class="post-item">
+                <div class="post-header">
+                    <h3 class="post-title">The greatness of Croatia</h3>
+                    <div class="post-date">04/09</div>
+                </div>
+                <img src="https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="Croatia coastline" class="post-image">
+                <div class="post-footer">
+                    <div class="post-likes">26985 Likes</div>
+                    <div class="post-description">This is an example of a very good photo that you can post on instagram</div>
+                </div>
+            </div>
+
+            <!-- Post 3 -->
+            <div class="post-item">
+                <div class="post-header">
+                    <h3 class="post-title">Amazing GOAL by Cristiano!</h3>
+                    <div class="post-date">06/10</div>
+                </div>
+                <img src="https://images.unsplash.com/photo-1574629810360-7efbbe195018?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="Soccer celebration" class="post-image">
+                <div class="post-footer">
+                    <div class="post-likes">204 Likes</div>
+                    <div class="post-description">This is an example of a very good photo that you can post on instagram</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para crear nuevo post -->
+    <div class="modal fade" id="createPostModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Create a new post</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Caption:</label>
+                        <textarea class="form-control caption-input" placeholder="Add the caption of your post here"></textarea>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-outline-secondary">
+                            <i class="fas fa-camera"></i>
+                        </button>
+                        <button class="btn btn-outline-secondary">
+                            <i class="fas fa-map-marker-alt"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-close-modal" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn-publish">Publish</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Función para cambiar entre vista de cuadrícula y feed
+        function switchView(viewType) {
+            const gridView = document.getElementById('gridView');
+            const feedView = document.getElementById('feedView');
+            const gridBtn = document.getElementById('gridViewBtn');
+            const feedBtn = document.getElementById('feedViewBtn');
+
+            if (viewType === 'grid') {
+                // Mostrar vista de cuadrícula
+                gridView.style.display = 'block';
+                feedView.style.display = 'none';
+                gridBtn.classList.add('active');
+                feedBtn.classList.remove('active');
+            } else {
+                // Mostrar vista de feed
+                gridView.style.display = 'none';
+                feedView.style.display = 'block';
+                feedBtn.classList.add('active');
+                gridBtn.classList.remove('active');
+            }
+        }
+
+        // Funcionalidad adicional para el modal
+        document.addEventListener('DOMContentLoaded', function() {
+            const publishBtn = document.querySelector('.btn-publish');
+            const captionInput = document.querySelector('.caption-input');
+            
+            publishBtn.addEventListener('click', function() {
+                const caption = captionInput.value.trim();
+                if (caption) {
+                    alert('Post publicado: ' + caption);
+                    captionInput.value = '';
+                    // Cerrar modal
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('createPostModal'));
+                    modal.hide();
+                } else {
+                    alert('Por favor, agrega una descripción a tu post');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
